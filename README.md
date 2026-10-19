@@ -76,6 +76,18 @@ npm run dev -w @cardverse/web
 npm run build
 ```
 
+### Triển khai (deploy)
+
+Frontend lấy URL backend từ biến `VITE_SERVER_URL` (mặc định `http://localhost:3001` khi chạy local).
+
+```bash
+# Ví dụ build frontend trỏ tới backend đã deploy
+VITE_SERVER_URL=https://your-server.example.com npm run build -w @cardverse/web
+```
+
+- Frontend tĩnh: deploy thư mục `apps/web/dist` (Vercel/Netlify/…).
+- Backend: chạy `npm run build -w @cardverse/server` rồi `npm start -w @cardverse/server`, nhớ đặt `CORS_ORIGIN` = domain frontend.
+
 ### Kiểm thử
 
 ```bash

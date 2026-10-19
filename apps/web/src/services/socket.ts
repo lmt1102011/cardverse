@@ -1,10 +1,12 @@
 import { io, Socket } from 'socket.io-client'
 
+const SERVER_URL = (import.meta as any).env?.VITE_SERVER_URL || 'http://localhost:3001'
+
 let socket: Socket | null = null
 
 export function getSocket(): Socket {
   if (!socket) {
-    socket = io('http://localhost:3001', {
+    socket = io(SERVER_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
