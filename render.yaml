@@ -1,4 +1,5 @@
 services:
+  # Backend: Fastify + Socket.IO
   - type: web
     name: cardverse-server
     runtime: node
@@ -14,4 +15,22 @@ services:
       - key: HOST
         value: 0.0.0.0
       - key: CORS_ORIGIN
-        value: https://lmt1102011.github.io
+        value: https://lmt1102011.github.io,https://cardverse-web.onrender.com
+
+  # Frontend: static site, tự trỏ vào backend ở trên
+  - type: web
+    name: cardverse-web
+    runtime: static
+    rootDir: .
+    buildCommand: npm ci && npm run build -w @cardverse/shared && VITE_SERVER_URL=https://$CARDVERSE_SERVER_HOST npm run build -w @cardverse/web
+    staticPublishPath: apps/web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: CARDVERSE_SERVER_HOST
+        fromService:
+          name: cardverse-server
+          type: web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME

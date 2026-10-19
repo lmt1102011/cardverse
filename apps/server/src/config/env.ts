@@ -1,9 +1,14 @@
 ﻿import 'dotenv/config'
 
+const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+
 export const config = {
   port: Number(process.env.PORT) || 3001,
   host: process.env.HOST || '0.0.0.0',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  corsOrigin: (corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins) as string | string[],
   databaseUrl: process.env.DATABASE_URL || '',
   redisUrl: process.env.REDIS_URL || '',
   jwtSecret: process.env.JWT_SECRET || 'dev',
