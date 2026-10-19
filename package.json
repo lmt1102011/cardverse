@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@jridgewell/sourcemap-codec": "^1.6.0",
-    "@rollup/rollup-win32-x64-msvc": "^4.28.1",
     "@types/node": "^22.10.2",
     "@vitejs/plugin-react": "^4.3.3",
     "ajv": "^8.20.0",
@@ -36,5 +35,8 @@
     "postcss-nested": "^9.0.0",
     "postcss-selector-parser": "^7.1.6",
     "vite": "^5.4.11"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.28.1"
   }
 }
