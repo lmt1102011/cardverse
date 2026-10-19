@@ -80,6 +80,17 @@ function App() {
       }
     })
 
+    socket.on('rooms' as any, (roomList: any[]) => {
+      setRooms(roomList)
+    })
+
+    socket.on('room:closed' as any, () => {
+      store.setCurrentRoom(null)
+      setNotification('Phòng đã đóng')
+      setTimeout(() => setNotification(null), 2500)
+      setView('rooms')
+    })
+
     return () => {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
@@ -90,6 +101,8 @@ function App() {
       socket.off('game:dealt')
       socket.off('game:roundEnded')
       socket.off('magic:effect')
+      socket.off('rooms')
+      socket.off('room:closed')
     }
   }, [view])
 

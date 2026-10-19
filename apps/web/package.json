@@ -13,16 +13,17 @@
   },
   "dependencies": {
     "@cardverse/shared": "file:../../packages/shared",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",
     "socket.io-client": "^4.8.1",
-    "zustand": "^5.0.2",
-    "framer-motion": "^11.15.0",
-    "lucide-react": "^0.468.0",
+    "tailwind-merge": "^2.5.5",
+    "trystero": "^0.26.0",
     "zod": "^3.24.1",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.5"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/react": "^19.0.1",

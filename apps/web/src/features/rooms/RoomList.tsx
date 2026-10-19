@@ -122,8 +122,8 @@ export function RoomList({ mode, rooms, onBack, onJoinRoom, onCreateRoom, onRefr
 
               <button
                 onClick={() => {
-                  if (room.isPrivate) setJoinPassword(room.id)
-                  else onJoinRoom(room.id)
+                  if (room.isPrivate) setJoinPassword(room.code)
+                  else onJoinRoom(room.code)
                 }}
                 disabled={room.playerCount >= room.maxPlayers || room.status === 'playing'}
                 className="w-full py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold hover:from-emerald-500 hover:to-teal-500 disabled:opacity-40 transition flex items-center justify-center gap-2"

@@ -9,9 +9,11 @@ Web game đánh bài online nhiều người chơi theo thời gian thực. Giao
 | Thành phần | Công nghệ |
 |-----------|-----------|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS, Framer Motion, Zustand, Socket.IO Client |
-| Backend | Node.js, TypeScript, Fastify, Socket.IO |
-| Chia sẻ | packages/shared (types, game rules, Magic Card definitions) |
+| Backend | Node.js, TypeScript, Fastify, Socket.IO (tùy chọn, không bắt buộc) |
+| Chia sẻ | packages/shared (types, game rules, Magic Card definitions, GameManager) |
 | Database | PostgreSQL + Prisma (tùy chọn) |
+
+> **Chế độ chơi chính: P2P (không cần server).** Frontend dùng [Trystero](https://github.com/dmotz/trystero) WebRTC để kết nối trực tiếp giữa các trình duyệt. Người tạo phòng đóng vai trò host, chạy `GameManager` (từ `@cardverse/shared`) ngay trong trình duyệt và đồng bộ trạng thái cho mọi người qua WebRTC. Danh sách phòng được phát tán qua một phòng lobby P2P chung. Vì vậy có thể host tĩnh trên GitHub Pages mà không cần server. Backend Socket.IO trong `apps/server` vẫn được giữ để chạy LAN/tùy chọn.
 
 ## Cấu trúc dự án
 
@@ -27,13 +29,14 @@ cardverse/
 │   │       │   └── table/    # Bàn chơi, cược, Magic Card
 │   │       ├── components/   # PlayingCard, MagicCard
 │   │       ├── stores/       # Zustand store
-│   │       └── services/     # Socket.IO client
-│   └── server/               # Backend Fastify + Socket.IO
+│   │       └── services/     # net.ts — lớp P2P Trystero (host + client)
+│   └── server/               # Backend Fastify + Socket.IO (tùy chọn)
 │       └── src/
-│           ├── modules/games/ # GameManager (phòng, ván bài, settlement)
+│           ├── modules/games/ # re-export GameManager từ shared
 │           └── websocket/     # Socket.IO handlers
 ├── packages/
-│   └── shared/               # Types, game rules, Magic Card defs
+│   └── shared/               # Types, game rules, Magic Card defs, GameManager
+│       ├── src/game-manager/ # GameManager (phòng, ván bài, settlement, magic)
 │       └── src/game-rules/   # Blackjack VN, Bài Cào VN + tests
 ├── prisma/                   # Schema database (tùy chọn)
 ├── docker-compose.yml        # PostgreSQL + Redis
@@ -80,30 +83,17 @@ npm run build
 
 ### Triển khai (deploy)
 
-Có 2 cách. **Cách A (khuyến nghị)** deploy cả web + backend trên Render chỉ với 1 click, tự nối sẵn — cho ra 1 link chạy được ngay.
+**Khuyến nghị: GitHub Pages (thuần tĩnh, không cần backend).** Vì game chạy P2P qua WebRTC, chỉ cần host tĩnh thư mục `apps/web/dist`. Workflow `.github/workflows/deploy-web.yml` tự build và publish lên:
 
-#### Cách A — Render Blueprint (khuyến nghị, 1 click, tự nối backend)
-
-1. Vào https://render.com → đăng nhập bằng GitHub → **New** → **Blueprint**.
-2. Chọn repo `lmt1102011/cardverse`. Render đọc `render.yaml` và tạo:
-   - `cardverse-server` — backend Node (Fastify + Socket.IO), free tier.
-   - `cardverse-web` — frontend static, tự build với `VITE_SERVER_URL` trỏ vào backend.
-4. Bấm **Apply** và chờ 2 service deploy xong. Web chạy tại:
-   **https://cardverse-web.onrender.com**
-
-> Free tier "ngủ" sau ~15 phút không dùng; lần mở đầu có thể chậm ~30–50s.
-
-#### Cách 2: Frontend lên GitHub Pages (đã bật sẵn)
-
-Workflow `.github/workflows/deploy-web.yml` tự build và publish lên:
 **https://lmt1102011.github.io/cardverse/**
 
-Nhưng Pages là tĩnh, cần backend riêng. Nếu dùng cách này:
-1. Deploy backend: Render → **New → Blueprint** (hoặc chỉ tạo service `cardverse-server`).
-2. Repo → **Settings → Secrets and variables → Actions → Variables → New variable**:
-   - Name: `VITE_SERVER_URL`, Value: URL backend (vd `https://cardverse-server.onrender.com`)
-3. Đảm bảo `CORS_ORIGIN` của backend có `https://lmt1102011.github.io`.
-4. Chạy lại workflow **Deploy web to GitHub Pages**.
+Bật Pages: repo → **Settings → Pages → Source: GitHub Actions**, rồi chạy workflow **Deploy web to GitHub Pages**. Không cần cấu hình `VITE_SERVER_URL`.
+
+Lưu ý: WebRTC/Trystero cần HTTPS (Pages đã có sẵn) và signaling qua các relay công cộng của Trystero.
+
+#### Tùy chọn: Render (nếu muốn chạy kèm backend Socket.IO cũ)
+
+Vẫn có sẵn `render.yaml` (blueprint 2 service `cardverse-server` + `cardverse-web`) và `Dockerfile`. Tuy nhiên frontend hiện mặc định dùng P2P, nên không bắt buộc.
 
 #### Chạy backend bằng Docker (tùy chọn)
 
@@ -132,7 +122,7 @@ npm test -w @cardverse/server   # GameManager + luồng Socket.IO end-to-end
 
 ### Phòng chơi
 - [x] Tạo phòng (công khai/riêng tư, tối đa 8 người, mức cược)
-- [x] Danh sách phòng real-time (Socket.IO)
+- [x] Danh sách phòng real-time (phát tán qua lobby P2P)
 - [x] Tham gia phòng, phòng đầy, phòng đang chơi
 - [x] Mã phòng 6 ký tự
 
