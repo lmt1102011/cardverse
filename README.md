@@ -78,15 +78,36 @@ npm run build
 
 ### Triển khai (deploy)
 
-Frontend lấy URL backend từ biến `VITE_SERVER_URL` (mặc định `http://localhost:3001` khi chạy local).
+Kiến trúc deploy: **Frontend tĩnh → GitHub Pages**, **Backend Node → Render** (hoặc Docker ở bất kỳ đâu). Frontend lấy URL backend qua biến `VITE_SERVER_URL`.
+
+#### 1. Backend lên Render (1 click)
+
+1. Vào https://render.com → **New** → **Blueprint** → chọn repo `lmt1102011/cardverse`.
+2. Render đọc `render.yaml` và tạo service `cardverse-server` (Node, free tier), tự set `CORS_ORIGIN=https://lmt1102011.github.io`.
+3. Sau khi deploy xong, copy URL dạng `https://cardverse-server-xxxx.onrender.com`.
+
+> Free tier sẽ "ngủ" sau ~15 phút không dùng; request đầu tiên có thể chậm ~30s.
+
+#### 2. Trỏ frontend vào backend
+
+Vào repo → **Settings → Secrets and variables → Actions → Variables → New variable**:
+- Name: `VITE_SERVER_URL`
+- Value: URL backend ở bước 1 (ví dụ `https://cardverse-server-xxxx.onrender.com`)
+
+#### 3. Frontend lên GitHub Pages
+
+1. Vào repo → **Settings → Pages → Source → chọn "GitHub Actions"**.
+2. Push lên `main` (hoặc chạy workflow **Deploy web to GitHub Pages** thủ công ở tab Actions).
+3. Sau khi workflow xanh, web chạy tại: **https://lmt1102011.github.io/cardverse/**
+
+Workflow: `.github/workflows/deploy-web.yml` (build với `VITE_BASE=/cardverse/` rồi publish `apps/web/dist`).
+
+#### Chạy backend bằng Docker (tùy chọn)
 
 ```bash
-# Ví dụ build frontend trỏ tới backend đã deploy
-VITE_SERVER_URL=https://your-server.example.com npm run build -w @cardverse/web
+docker build -t cardverse-server .
+docker run -p 3001:3001 -e CORS_ORIGIN=https://lmt1102011.github.io cardverse-server
 ```
-
-- Frontend tĩnh: deploy thư mục `apps/web/dist` (Vercel/Netlify/…).
-- Backend: chạy `npm run build -w @cardverse/server` rồi `npm start -w @cardverse/server`, nhớ đặt `CORS_ORIGIN` = domain frontend.
 
 ### Kiểm thử
 

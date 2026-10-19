@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cardverse-server
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: npm ci && npm run build -w @cardverse/shared && npm run build -w @cardverse/server
+    startCommand: npm start -w @cardverse/server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: HOST
+        value: 0.0.0.0
+      - key: CORS_ORIGIN
+        value: https://lmt1102011.github.io
