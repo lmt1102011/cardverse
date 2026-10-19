@@ -1,0 +1,52 @@
+﻿generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  avatar    String   @default("🎭")
+  chips     Int      @default(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  magicCards UserMagicCard[]
+  games     GameRecord[]
+}
+
+model MagicCard {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  rarity      String
+  description String
+  fullDesc    String
+  users       UserMagicCard[]
+}
+
+model UserMagicCard {
+  id          String   @id @default(uuid())
+  userId      String
+  magicCardId String
+  quantity    Int      @default(1)
+  roundWonAt  String?
+  user        User     @relation(fields: [userId], references: [id])
+  magicCard   MagicCard @relation(fields: [magicCardId], references: [id])
+  @@unique([userId, magicCardId])
+}
+
+model GameRecord {
+  id        String   @id @default(uuid())
+  userId    String
+  mode      String
+  roomId    String
+  roundId   String
+  result    String
+  payout    Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
