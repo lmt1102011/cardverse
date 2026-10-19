@@ -1,5 +1,7 @@
 ﻿# BÀI QUẨY — CARDVERSE
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/lmt1102011/cardverse)
+
 Web game đánh bài online nhiều người chơi theo thời gian thực. Giao diện hiện đại, hệ thống phòng chơi, chip ảo, luật chơi Việt Nam và hệ thống Magic Card độc đáo.
 
 ## Công nghệ
